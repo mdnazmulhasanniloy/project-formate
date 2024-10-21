@@ -7,6 +7,8 @@ import { sendEmail } from '../../utils/mailSender';
 import config from '../../config';
 import { User } from '../user/user.models';
 import { IUser } from '../user/user.interface';
+import fs from 'fs';
+import path from 'path';
 
 const verifyOtp = async (token: string, otp: string | number) => {
   if (!token) {
@@ -107,17 +109,32 @@ const resendOtp = async (email: string) => {
     expiresIn: '3m',
   });
 
-  await sendEmail(
-    user?.email,
-    'Your One Time OTP',
-    `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #4CAF50;">Your One Time OTP</h2>
-      <div style="background-color: #f2f2f2; padding: 20px; border-radius: 5px;">
-        <p style="font-size: 16px;">Your OTP is: <strong>${otp}</strong></p>
-        <p style="font-size: 14px; color: #666;">This OTP is valid until: ${expiresAt.toLocaleString()}</p>
-      </div>
-    </div>`,
-  );
+    const otpEmailPath = path.join(
+      __dirname,
+      '../../../../public/view/otp_mail.html',
+    );
+
+    await sendEmail(
+      user?.email,
+      'Your One Time OTP',
+      fs
+        .readFileSync(otpEmailPath, 'utf8')
+        .replace('{{otp}}', otp)
+        .replace('{{email}}', user?.email),
+    );
+
+
+  // await sendEmail(
+  //   user?.email,
+  //   'Your One Time OTP',
+  //   `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+  //     <h2 style="color: #4CAF50;">Your One Time OTP</h2>
+  //     <div style="background-color: #f2f2f2; padding: 20px; border-radius: 5px;">
+  //       <p style="font-size: 16px;">Your OTP is: <strong>${otp}</strong></p>
+  //       <p style="font-size: 14px; color: #666;">This OTP is valid until: ${expiresAt.toLocaleString()}</p>
+  //     </div>
+  //   </div>`,
+  // );
 
   return { token };
 };

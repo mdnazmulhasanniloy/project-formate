@@ -2,12 +2,14 @@ import { Error, Query, Schema, model } from 'mongoose';
 import config from '../../config';
 import bcrypt from 'bcrypt';
 import { IUser, UserModel } from './user.interface';
+import { Role, USER_ROLE } from './user.constants';
 
 const userSchema: Schema<IUser> = new Schema(
   {
     status: {
       type: String,
-      required: true,
+      enum: ['active', 'blocked'],
+      default: 'active',
     },
     username: {
       type: String,
@@ -16,7 +18,7 @@ const userSchema: Schema<IUser> = new Schema(
     },
     name: {
       type: String,
-      required: true,
+      default: null,
     },
     email: {
       type: String,
@@ -25,7 +27,7 @@ const userSchema: Schema<IUser> = new Schema(
     },
     phoneNumber: {
       type: String,
-      required: true,
+      default: null,
     },
     password: {
       type: String,
@@ -34,26 +36,27 @@ const userSchema: Schema<IUser> = new Schema(
     gender: {
       type: String,
       enum: ['Male', 'Female', 'Others'],
-      required: true,
+      default: null,
     },
     dateOfBirth: {
       type: String,
-      required: true,
+      default: null,
     },
     image: {
       type: String,
-      required: true,
+      default: null,
     },
     role: {
       type: String,
-      required: true,
+      enum: Role,
+      default: USER_ROLE.user,
     },
     address: {
       type: String,
+      default: null,
     },
     needsPasswordChange: {
       type: Boolean,
-      required: true,
     },
     passwordChangedAt: {
       type: Date,
@@ -65,15 +68,13 @@ const userSchema: Schema<IUser> = new Schema(
     verification: {
       otp: {
         type: Schema.Types.Mixed,
-        required: true,
+        default: 0,
       },
       expiresAt: {
         type: Date,
-        required: true,
       },
       status: {
-        type: Boolean,
-        required: true,
+        type: Boolean, 
         default: false,
       },
     },
