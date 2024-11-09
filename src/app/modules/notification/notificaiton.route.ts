@@ -8,9 +8,8 @@ const router = Router();
 router.get(
   '/',
   auth(
-    USER_ROLE.seller,
-    USER_ROLE.admin,
-    USER_ROLE.buyer,
+    USER_ROLE.user,
+    USER_ROLE.admin, 
     USER_ROLE.sub_admin,
     USER_ROLE.super_admin,
   ),
@@ -19,9 +18,8 @@ router.get(
 router.patch(
   '/',
   auth(
-    USER_ROLE.seller,
-    USER_ROLE.admin,
-    USER_ROLE.buyer,
+    USER_ROLE.user,
+    USER_ROLE.admin, 
     USER_ROLE.sub_admin,
     USER_ROLE.super_admin,
   ),

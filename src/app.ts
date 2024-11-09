@@ -10,6 +10,8 @@ import notFound from './app/middleware/notfound';
 import router from './app/routes';
 const app: Application = express();
 app.use(express.static('public'));
+app.use(express.json({ limit: '500mb' }));
+app.use(express.urlencoded({ limit: '500mb', extended: true }));
 
 //parsers
 app.use(express.json());
