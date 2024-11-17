@@ -11,13 +11,9 @@ const userSchema: Schema<IUser> = new Schema(
       enum: ['active', 'blocked'],
       default: 'active',
     },
-    username: {
-      type: String,
-      required: true,
-      unique: true,
-    },
     name: {
       type: String,
+      required: true,
       default: null,
     },
     email: {
@@ -27,11 +23,12 @@ const userSchema: Schema<IUser> = new Schema(
     },
     phoneNumber: {
       type: String,
+      required: true,
       default: null,
     },
     password: {
       type: String,
-      required: true,
+      required: false,
     },
     gender: {
       type: String,
@@ -41,6 +38,10 @@ const userSchema: Schema<IUser> = new Schema(
     dateOfBirth: {
       type: String,
       default: null,
+    },
+    isGoogleLogin: {
+      type: Boolean,
+      default: false,
     },
     image: {
       type: String,
@@ -74,7 +75,7 @@ const userSchema: Schema<IUser> = new Schema(
         type: Date,
       },
       status: {
-        type: Boolean, 
+        type: Boolean,
         default: false,
       },
     },
@@ -87,10 +88,12 @@ const userSchema: Schema<IUser> = new Schema(
 userSchema.pre('save', async function (next) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this;
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_rounds),
-  );
+  if (!user?.isGoogleLogin) {
+    user.password = await bcrypt.hash(
+      user.password,
+      Number(config.bcrypt_salt_rounds),
+    );
+  }
   next();
 });
 

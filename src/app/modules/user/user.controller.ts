@@ -7,20 +7,23 @@ import { uploadToS3 } from '../../utils/s3';
 import { otpServices } from '../otp/otp.service';
 import { User } from './user.models';
 import { UploadedFiles } from '../../interface/common.interface';
+import { storeFile } from '../../utils/fileHelper';
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   // return res.send({data: req.body})
+ if (req.file) {
+   req.body.image = storeFile('profile', req?.file?.filename);
+ }
+  // if (req.files) {
+  //   const { image } = req.files as UploadedFiles;
 
-  if (req.files) {
-    const { image } = req.files as UploadedFiles;
-
-    if (image) {
-      req.body.image = await uploadToS3({
-        file: req.file,
-        fileName: `images/user/profile/${Math.floor(100000 + Math.random() * 900000)}`,
-      });
-    }
-  }
+  //   if (image) {
+  //     req.body.image = await uploadToS3({
+  //       file: req.file,
+  //       fileName: `images/user/profile/${Math.floor(100000 + Math.random() * 900000)}`,
+  //     });
+  //   }
+  // }
   const result = await userService.createUser(req.body);
   const sendOtp = await otpServices.resendOtp(result?.email);
   sendResponse(res, {
@@ -64,12 +67,15 @@ const getMyProfile = catchAsync(async (req: Request, res: Response) => {
 const updateUser = catchAsync(async (req: Request, res: Response) => {
   await User.findById(req.params.id);
 
-  if (req?.file) {
-    req.body.image = await uploadToS3({
-      file: req.file,
-      fileName: `images/user/profile/${Math.floor(100000 + Math.random() * 900000)}`,
-    });
+  if (req.file) {
+    req.body.image = storeFile('profile', req?.file?.filename);
   }
+  // if (req?.file) {
+  //   req.body.image = await uploadToS3({
+  //     file: req.file,
+  //     fileName: `images/user/profile/${Math.floor(100000 + Math.random() * 900000)}`,
+  //   });
+  // }
 
   const result = await userService.updateUser(req.params.id, req.body);
   sendResponse(res, {
@@ -82,11 +88,15 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
 
 const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
   await User.findById(req.user.userId);
-  if (req?.file) {
-    req.body.image = await uploadToS3({
-      file: req.file,
-      fileName: `images/user/profile/${Math.floor(100000 + Math.random() * 900000)}`,
-    });
+  // if (req?.file) {
+  //   req.body.image = await uploadToS3({
+  //     file: req.file,
+  //     fileName: `images/user/profile/${Math.floor(100000 + Math.random() * 900000)}`,
+  //   });
+  // }
+
+  if (req.file) {
+    req.body.image = storeFile('profile', req?.file?.filename);
   }
 
   const result = await userService.updateUser(req?.user?.userId, req.body);

@@ -14,6 +14,7 @@ export interface IUser {
   dateOfBirth: string;
   image: string;
   role: string;
+  isGoogleLogin: boolean;
   address?: string;
   needsPasswordChange: boolean;
   passwordChangedAt?: Date;

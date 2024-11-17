@@ -20,6 +20,18 @@ const createUser = async (payload: IUser): Promise<IUser> => {
     );
   }
 
+  if (payload?.isGoogleLogin) {
+    payload.verification = {
+      otp: 0,
+      expiresAt: new Date(Date.now()),
+      status: true,
+    };
+  }
+
+  if (!payload.isGoogleLogin && !payload.password) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Password is required');
+  }
+
   const user = await User.create(payload);
   if (!user) {
     throw new AppError(httpStatus.BAD_REQUEST, 'User creation failed');
@@ -34,7 +46,7 @@ const getAllUser = async (query: Record<string, any>) => {
     .paginate()
     .sort();
   const data: any = await userModel.modelQuery;
-  const meta = await userModel.countTotal(); 
+  const meta = await userModel.countTotal();
   return {
     data,
     meta,
