@@ -109,6 +109,12 @@ class QueryBuilder<T> {
             this.modelQuery = this.modelQuery.find({
               [key]: { $ne: Number(amount) },
             });
+          } else if (value.includes('!')) {
+            const [, v] = value.split('!');
+            console.log(v);
+            this.modelQuery = this.modelQuery.find({
+              [key]: { $ne: v },
+            });
           } else if (value.includes('-')) {
             // Handle range filtering (min-max)
             const [min, max] = value.split('-').map(Number);
@@ -117,14 +123,19 @@ class QueryBuilder<T> {
                 [key]: { $gte: min, $lte: max },
               });
             }
-          } else if (value.includes('&')) {
-            const queryValues = value.split('&');
-            console.log(queryValues);
+          } else if (value.includes('||')) {
+            const queryValues = value.split('||');
             const query = queryValues?.map(queryValue => ({
               [key]: queryValue,
             }));
             this.modelQuery = this.modelQuery.find({
               $or: query,
+            });
+          } else if (/^\[.*?\]$/.test(value)) {
+            const match = value.match(/\[(.*?)\]/);
+            const queryValue = match ? match[1] : value;
+            this.modelQuery = this.modelQuery.find({
+              [key]: { $in: [queryValue] },
             });
           } else {
             // Fallback: Handle normal equality

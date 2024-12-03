@@ -49,6 +49,7 @@ const create${capitalizeFirstLetter(folderName)} = async (payload: I${capitalize
 };
 
 const getAll${capitalizeFirstLetter(folderName)} = async (query: Record<string, any>) => {
+query["isDeleted"] = false;
   const ${folderName}Model = new QueryBuilder(${capitalizeFirstLetter(folderName)}.find(), query)
     .search([])
     .filter()
@@ -67,7 +68,7 @@ const getAll${capitalizeFirstLetter(folderName)} = async (query: Record<string, 
 
 const get${capitalizeFirstLetter(folderName)}ById = async (id: string) => {
   const result = await ${capitalizeFirstLetter(folderName)}.findById(id);
-  if (!result) {
+  if (!result && result?.isDeleted) {
     throw new Error('${capitalizeFirstLetter(folderName)} not found!');
   }
   return result;
@@ -207,17 +208,17 @@ const ${folderName}Schema = new Schema<I${capitalizeFirstLetter(folderName)}>(
   }
 );
 
-${folderName}Schema.pre('find', function (next) {
-  //@ts-ignore
-  this.find({ isDeleted: { $ne: true } });
-  next();
-});
+//${folderName}Schema.pre('find', function (next) {
+//  //@ts-ignore
+//  this.find({ isDeleted: { $ne: true } });
+//  next();
+//});
 
-${folderName}Schema.pre('findOne', function (next) {
+//${folderName}Schema.pre('findOne', function (next) {
   //@ts-ignore
-  this.find({ isDeleted: { $ne: true } });
-  next();
-});
+  //this.find({ isDeleted: { $ne: true } });
+ // next();
+//});
 
 ${folderName}Schema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
